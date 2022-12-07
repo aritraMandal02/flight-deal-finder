@@ -3,7 +3,6 @@ from pluralizer import Pluralizer
 
 
 class Sheety:
-
     def __init__(self, sheet_name: str, url: str, token: str):
         self.url = url
         self.headers = dict(Authorization=token)
@@ -14,22 +13,29 @@ class Sheety:
         self.row_entry = pluralizer.singular(sheet_name.lower())
 
     def get_sheet(self) -> list:
-        response = requests.get(url=self.url, headers=self.headers).json()[self.sheet_name]
+        response = requests.get(url=self.url, headers=self.headers).json()[
+            self.sheet_name
+        ]
         return response
 
     def edit_row(self, row_id: int, row_params: dict) -> requests.Response:
         body = {self.row_entry: row_params}
-        self.edit_row_response = requests.put(url=f'{self.url}/{row_id}', json=body, headers=self.headers)
+        self.edit_row_response = requests.put(
+            url=f"{self.url}/{row_id}", json=body, headers=self.headers
+        )
         return self.edit_row_response
-        
+
     def post_row(self, row_params: dict) -> requests.Response:
         body = {self.row_entry: row_params}
         self.post_row_response = requests.post(
-            url=self.url, json=body, headers=self.headers)
+            url=self.url, json=body, headers=self.headers
+        )
         return self.post_row_response
 
     def delete_row(self, row_id: int) -> requests.Response:
-        self.delete_row_response = requests.delete(url=f'{self.url}/{row_id}', headers=self.headers)
+        self.delete_row_response = requests.delete(
+            url=f"{self.url}/{row_id}", headers=self.headers
+        )
         return self.delete_row_response
 
     def edit_value(self, row_id: int, col_name: str, value):
@@ -42,8 +48,8 @@ class Sheety:
         i = 0
         for e in self.sheet_data:
             e[col_name] = values[i]
-            e.pop('id')
-            self.edit_row(row_id=i+2, row_params=e)
+            e.pop("id")
+            self.edit_row(row_id=i + 2, row_params=e)
             i += 1
 
     def get_column(self, col_name) -> list:
