@@ -3,9 +3,12 @@ import datetime as dt
 from dateutil.relativedelta import relativedelta
 from flight_search import FlightSearch
 from auth import sheety_url, TOKEN
-from auth import tequila_search_url, tequila_api_key
+from auth import tequila_search_url, tequila_api_key, account_sid, auth_token
+from msg_sender import MailMan
 
 flight_search = FlightSearch(url=tequila_search_url, api_key=tequila_api_key)
+mailMan = MailMan(account_sid, auth_token)
+
 sheet_name = "prices"
 url = sheety_url
 token = TOKEN
@@ -45,6 +48,7 @@ class Manager(Sheety):
         for new, old in zip(self.lowestPrices_new, self.lowestPrices_old):
             if new < old:
                 self.edit_value(row_id=i + 2, col_name="lowestPrice", value=new)
+                mailMan.send_sms()
             i += 1
 
     def test(self):
