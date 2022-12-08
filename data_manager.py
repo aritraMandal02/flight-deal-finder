@@ -35,25 +35,29 @@ class Manager(Sheety):
 
     def get_details(self, city_codes: list):
         self.lowestPrices_new = []
+        self.city_from = []
+        self.city_to = []
         for city in city_codes:
             params = self.flight_search_params(city)
             flight_deals = flight_search.get_flight_deals(params)["data"][0]
-            price = flight_deals["price"]
-            self.city_from = f"{flight_deals['cityFrom']}-{flight_deals['flyFrom']}"
-            self.city_to = f"{flight_deals['cityTo']}-{flight_deals['flyTo']}"
-            self.lowestPrices_new.append(price)
+            self.city_from.append(
+                f"{flight_deals['cityFrom']}-{flight_deals['flyFrom']}"
+            )
+            self.city_to.append(f"{flight_deals['cityTo']}-{flight_deals['flyTo']}")
+            self.lowestPrices_new.append(flight_deals["price"])
 
     def start(self):
         city_codes = self.get_column("iataCode")
         self.get_details(city_codes)
         self.lowestPrices_old = self.get_column("lowestPrice")
         i = 0
-        for new, old in zip(self.lowestPrices_new, self.lowestPrices_old):
+        for new, old, city_from, city_to in zip(
+            self.lowestPrices_new, self.lowestPrices_old, self.city_from, self.city_to
+        ):
             if new < old:
                 self.edit_value(row_id=i + 2, col_name="lowestPrice", value=new)
-                msg = f"Only ₹{new} to fly from {self.city_from} to {self.city_to}, from {self.date_from} to {self.date_to}"
+                msg = f"Low price alert! Only ₹{new} to fly from {city_from} to {city_to}, from {self.date_from} to {self.date_to}"
                 mailMan.send_sms(body=msg)
-                print("change", i)
             i += 1
 
     def test(self):
