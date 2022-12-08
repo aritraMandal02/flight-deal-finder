@@ -22,6 +22,6 @@ class FlightSearch:
         city_code = response.json()["locations"][0]["code"]
         return city_code
 
-    def get_flight_deals(self, params: dict):
+    def get_flight_deals(self, params: dict) -> dict:
         response = requests.get(url=self.url, params=params, headers=self.headers)
         return response.json()
