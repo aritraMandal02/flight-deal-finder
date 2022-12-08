@@ -1,13 +1,15 @@
-from flight_search import FlightSearch
-from sheety import Sheety
-from auth import sheety_url,TOKEN
+from data_manager import Manager
 
+
+manager = Manager()
+manager.start()
 
 # sheet = Sheety(sheet_name='prices', url=sheety_url, token=TOKEN)
 # data = sheet.sheet_data
 # print(data)
 # city_names = sheet.get_column(col_name='city')
-# flight_search = FlightSearch(city_names)
+# flight_search = FlightSearch()
+# print(flight_search.get_city_codes())
 # city_codes = flight_search.get_city_codes()
 # print(city_codes)
 # print(city_codes)

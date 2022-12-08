@@ -52,7 +52,7 @@ class Sheety:
             self.edit_row(row_id=i + 2, row_params=e)
             i += 1
 
-    def get_column(self, col_name) -> list:
+    def get_column(self, col_name: str) -> list:
         self.col_items = []
         for e in self.sheet_data:
             self.col_items.append(e[col_name])
