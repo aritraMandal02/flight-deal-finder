@@ -17,9 +17,12 @@ class FlightSearch:
     def get_city_code(self, city_name: str) -> list:
         if not city_name:
             return "CCU"
-        city_names = [dict(term=city) for city in city_names]
+        city_name = dict(term=city_name)
         response = requests.get(url=self.url, params=city_name, headers=self.headers)
-        city_code = response.json()["locations"][0]["code"]
+        try:
+            city_code = response.json()["locations"][0]["code"]
+        except KeyError:
+            city_code = "CCU"
         return city_code
 
     def get_flight_deals(self, params: dict) -> dict:
