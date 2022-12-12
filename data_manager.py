@@ -10,14 +10,16 @@ import json
 flight_search = FlightSearch(url=tequila_search_url, api_key=tequila_api_key)
 mailMan = MailMan(account_sid, auth_token)
 
-sheet_name = "prices"
+prices_sheet_name = "prices"
+users_sheet_name = "users"
 url = sheety_url
 token = TOKEN
 
 
-class Manager(Sheety):
+class Manager:
     def __init__(self):
-        # super().__init__(sheet_name, url, token)
+        # self.prices_sheet = Sheety(prices_sheet_name, url, token)
+        # self.users_sheet = Sheety(users_sheet_name, url, token)
         self.date_from = (dt.datetime.now() + relativedelta(days=1)).strftime(
             "%d/%m/%Y"
         )
@@ -62,12 +64,12 @@ class Manager(Sheety):
                 self.lowestPrices_new.append(flight_deals["price"])
                 from_ = flight_deals["route"][0]["local_departure"].split("T")[0]
                 to_ = flight_deals["route"][-1]["local_arrival"].split("T")[0]
-                self.journey_dates.append(f"{from_} to {to_}")
+                self.journey_dates.append((from_, to_))
 
     def start(self):
-        city_codes = self.get_column("iataCode")
+        city_codes = self.prices_sheet.get_column("iataCode")
         self.get_details(city_codes)
-        self.lowestPrices_old = self.get_column("lowestPrice")
+        self.lowestPrices_old = self.prices_sheet.get_column("lowestPrice")
         i = 0
         for new, old, city_from, city_to, journey_date in zip(
             self.lowestPrices_new,
@@ -78,9 +80,18 @@ class Manager(Sheety):
         ):
             if new != "NULL":
                 if new < old:
-                    self.edit_value(row_id=i + 2, col_name="lowestPrice", value=new)
-                    msg = f"Low price alert! Only ₹{new} to fly from {city_from} to {city_to}, from {journey_date}"
+                    self.prices_sheet.edit_value(
+                        row_id=i + 2, col_name="lowestPrice", value=new
+                    )
+                    msg = f"Low price alert! Only ₹{new} to fly from {city_from} to {city_to}, from {journey_date[0]} to {journey_date[1]}"
+                    gfl = f"https://www.google.co.uk/flights?hl=en#flt={city_from}.{city_to}.{journey_date[0]}*{city_to}.{city_from}.{journey_date[1]}"
                     mailMan.send_sms(body=msg)
+                    mailMan.send_email(
+                        body=f"{msg}\n{gfl}",
+                        addr=self.users_sheet.get_value(
+                            row_id=i + 2, col_name="emails"
+                        ),
+                    )
             i += 1
 
     def test(self):

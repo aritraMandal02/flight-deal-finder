@@ -44,6 +44,10 @@ class Sheety:
         row_params[col_name] = value
         return self.edit_row(row_id + 2, row_params)
 
+    def get_value(self, row_id: int, col_name: str):
+        row_id -= 2
+        return self.sheet_data[row_id][col_name]
+
     def edit_column(self, col_name: str, values: list):
         i = 0
         for e in self.sheet_data:
